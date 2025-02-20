@@ -17,7 +17,7 @@ python lite_avatar.py --data_dir /path/to/sample_data --audio_file /path/to/audi
 ```
 The mp4 video result will be saved in the result_dir.
 ## Interactive demo
-The realtime interactive video chat demo powered by our LiteAvatar algorithm is available at [open-video-chat](https://github.com/HumanAIGC-Engineering/OpenAvatarChat)
+The realtime interactive video chat demo powered by our LiteAvatar algorithm is available at [OpenAvatarChat](https://github.com/HumanAIGC-Engineering/OpenAvatarChat)
 ## Acknowledgement
 We are grateful for the following open-source projects that we used in this project:
 - [Paraformer](https://modelscope.cn/models/iic/speech_paraformer-large_asr_nat-zh-cn-16k-common-vocab8404-pytorch)
