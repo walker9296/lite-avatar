@@ -8,7 +8,7 @@ from extract_paraformer_feature import extract_para_feature
 from scipy import signal
 
 class Audio2Mouth(object):
-    def __init__(self. use_gpu):
+    def __init__(self, use_gpu):
 
         self.p_list = [str(ii) for ii in range(32)]
 
