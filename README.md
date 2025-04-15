@@ -6,6 +6,8 @@ We introduce a audio2face model for realtime 2D chat avatar, which can run in 30
 - A lightweight 2D face generator model for mouth movement rendering, which can also be deployed on mobile devices realizing realtime inference.
 ## Data Preparation
 Get sample avatar data located in `./data/sample_data.zip` and extract to you path
+
+🔥More avatars can be found at [LiteAvatarGallery](https://modelscope.cn/models/HumanAIGC-Engineering/LiteAvatarGallery/summary)
 ## Installation
 We recommend a python version = 3.10 and cuda version = 11.8. Then build environment as follows:
 ```shell
