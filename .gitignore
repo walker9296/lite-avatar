@@ -5,3 +5,6 @@ __pycache__
 lm.pb
 model_1.onnx
 model.pb
+*.msc
+lite_avatar_weights/
+*.mv

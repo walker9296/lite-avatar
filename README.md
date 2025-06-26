@@ -11,6 +11,16 @@ We recommend a python version = 3.10 and cuda version = 11.8. Then build environ
 ```shell
 pip install -r requirements.txt
 ```
+
+## Model Preparation
+```shell
+# for windows
+download_model.bat
+
+# for linux
+bash download_model.sh
+```
+
 ## Inference
 ```
 python lite_avatar.py --data_dir /path/to/sample_data --audio_file /path/to/audio.wav --result_dir /path/to/result
