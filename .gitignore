@@ -1,3 +1,7 @@
 *.pyc
 __pycache__
 /results/
+
+lm.pb
+model_1.onnx
+model.pb

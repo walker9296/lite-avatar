@@ -1,0 +1,3 @@
+modelscope download --model HumanAIGC-Engineering/LiteAvatarGallery lite_avatar_weights/lm.pb --local_dir ./weights/speech_paraformer-large_asr_nat-zh-cn-16k-common-vocab8404-pytorch/lm/
+modelscope download --model HumanAIGC-Engineering/LiteAvatarGallery lite_avatar_weights/model_1.onnx --local_dir ./weights/
+modelscope download --model HumanAIGC-Engineering/LiteAvatarGallery lite_avatar_weights/model.pb --local_dir ./weights/speech_paraformer-large_asr_nat-zh-cn-16k-common-vocab8404-pytorch/
