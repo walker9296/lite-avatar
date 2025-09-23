@@ -17,6 +17,7 @@ from tqdm import tqdm
 import torch
 from scipy.interpolate import interp1d
 import wave
+import shutil
 
 
 def geneHeadInfo(sampleRate, bits, sampleNum):
@@ -316,7 +317,7 @@ class liteAvatar(object):
         
         tmp_frame_dir = os.path.join(result_dir, 'tmp_frames')
         if os.path.exists(tmp_frame_dir):
-            os.system(f'rm -rf {tmp_frame_dir}')
+            shutil.rmtree(tmp_frame_dir)
         os.mkdir(tmp_frame_dir)
         
         while True:
@@ -330,8 +331,10 @@ class liteAvatar(object):
         for p in self.threads_prep:
             p.join()
         
-        cmd = '/usr/bin/ffmpeg -r 30 -i {}/%05d.jpg -i {} -framerate 30 -c:v libx264 -pix_fmt yuv420p -b:v 5000k -strict experimental -loglevel error {}/test_demo.mp4 -y'.format(tmp_frame_dir, audio_file_path, result_dir)
+        video_path = os.path.join(result_dir, 'test_demo.mp4')
+        cmd = f'ffmpeg -r 30 -i {tmp_frame_dir}/%05d.jpg -i {audio_file_path} -framerate 30 -c:v libx264 -pix_fmt yuv420p -b:v 5000k -strict experimental -loglevel error {video_path} -y'
         os.system(cmd)
+        return video_path
     
     @staticmethod
     def read_wav_to_bytes(file_path):
@@ -364,5 +367,6 @@ if __name__ == '__main__':
     
     lite_avatar = liteAvatar(data_dir=args.data_dir, num_threads=1, generate_offline=True)
     
-    lite_avatar.handle(audio_file, tmp_frame_dir)
+    video_path = lite_avatar.handle(audio_file, tmp_frame_dir)
+    print(f"Generated video: {video_path}")
     
