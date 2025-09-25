@@ -259,6 +259,9 @@ class liteAvatar(object):
         param_res = param_res + padding_list
         return param_res
     
+    def audio_chunk_to_param(self, audio_chunk_bytes):
+        return self.audio2param(audio_chunk_bytes)
+
     def audio2param(self, input_audio_byte, prefix_padding_size=0, is_complete=False, audio_status=-1):
         headinfo = geneHeadInfo(16000, 16, len(input_audio_byte))
         input_audio_byte = headinfo + input_audio_byte

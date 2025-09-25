@@ -1,66 +1,41 @@
-import os
-import uvicorn
-from fastapi import FastAPI, File, UploadFile, Form
-from fastapi.responses import FileResponse
-import shutil
-import tempfile
+import asyncio
+import websockets
+import json
 from lite_avatar import liteAvatar
-import subprocess as sp
-from loguru import logger
+import numpy as np
 
-app = FastAPI()
+class LiteAvatarService:
+    def __init__(self):
+        # self.avatar = liteAvatar(data_dir='D:/pei2/lite-avatar/data/sample_data', num_threads=1, generate_offline=True)
+        self.avatar = liteAvatar(data_dir='D:/pei2/lite-avatar/resource/avatar', num_threads=1, generate_offline=True)
+        self.audio_buffer = bytearray()
 
-def get_avatar_dir():
-    return os.path.join(os.path.abspath(os.path.dirname(__file__)), "resource", "avatar")
+    async def handle_connection(self, websocket, path):
+        print("Client connected")
+        try:
+            async for message in websocket:
+                # Pad the audio chunk if it's smaller than 1 second
+                if len(message) < 32000:
+                    padding = bytearray(32000 - len(message))
+                    message += padding
 
-def _download_from_modelscope(avatar_name: str) -> str:
-    """
-    download avatar data from modelscope to resource/avatar/liteavatar
-    return avatar_zip_path
-    """
-    if not avatar_name.endswith(".zip"):
-        avatar_name = avatar_name + ".zip"
-    avatar_dir = get_avatar_dir()
-    if not os.path.exists(avatar_dir):
-        os.makedirs(avatar_dir)
-    avatar_zip_path = os.path.join(avatar_dir, avatar_name)
-    if not os.path.exists(avatar_zip_path):
-        # cmd = [
-        #     "modelscope", "download", "--model", "HumanAIGC-Engineering/LiteAvatarGallery", avatar_name,
-        #     "--local_dir", avatar_dir
-        #     ]
-        logger.info("download avatar data from modelscope, {}", " ".join("https://modelscope.cn/models/HumanAIGC-Engineering/LiteAvatarGallery/files"))
-        # sp.run(cmd)
-    return avatar_zip_path
+                audio_chunk = np.frombuffer(message, dtype=np.int16)
+                param_res = self.avatar.audio_chunk_to_param(audio_chunk.tobytes())
+                
+                # In a real implementation, you would send the param_res back to the client
+                # For now, we'll just print it
+                print("Generated animation data")
 
-def _get_avatar_data_dir(avatar_name):
-    logger.info("use avatar name {}", avatar_name)
-    avatar_zip_path = _download_from_modelscope(avatar_name)
-    avatar_dir = get_avatar_dir()
-    extract_dir = os.path.join(avatar_dir, os.path.dirname(avatar_name))
-    avatar_data_dir = os.path.join(avatar_dir, avatar_name)
-    if not os.path.exists(avatar_data_dir):
-        # extract avatar data to dir
-        logger.info("extract avatar data to dir {}", extract_dir)
-        assert os.path.exists(avatar_zip_path)
-        shutil.unpack_archive(avatar_zip_path, extract_dir)
-    assert os.path.exists(avatar_data_dir)
-    return avatar_data_dir
+                await websocket.send(json.dumps(param_res))
 
-@app.post("/generate")
-async def generate(audio: UploadFile = File(...), avatar_name: str = Form("sample_data")):
-    data_dir = _get_avatar_data_dir(avatar_name)
-    lite_avatar = liteAvatar(data_dir=data_dir, num_threads=1, generate_offline=True)
+        except websockets.exceptions.ConnectionClosed:
+            print("Client disconnected")
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_audio_file:
-        shutil.copyfileobj(audio.file, tmp_audio_file)
-        tmp_audio_path = tmp_audio_file.name
-
-    result_dir = tempfile.mkdtemp()
-
-    video_path = lite_avatar.handle(tmp_audio_path, result_dir)
-
-    return FileResponse(video_path, media_type="video/mp4", filename="result.mp4")
+async def main():
+    service = LiteAvatarService()
+    server = await websockets.serve(service.handle_connection, "localhost", 8765)
+    print("WebSocket server started at ws://localhost:8765")
+    await server.wait_closed()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    asyncio.run(main())
